@@ -95,4 +95,20 @@ mod tests {
         let result = create_tip(&state, req).await;
         assert!(matches!(result, Err(TipError::InvalidInput(_))));
     }
+
+    #[sqlx::test]
+    async fn errors_when_creator_missing(pool: sqlx::PgPool) {
+        let state = AppState {
+            db: pool,
+            stellar: StellarService::with_base_url("http://127.0.0.1:1"),
+        };
+        let req = CreateTipRequest {
+            username: "nobody".into(),
+            amount: "5".into(),
+            transaction_hash: "abc123".into(),
+        };
+
+        let result = create_tip(&state, req).await;
+        assert!(matches!(result, Err(TipError::CreatorNotFound)));
+    }
 }
