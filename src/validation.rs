@@ -18,3 +18,19 @@ pub fn validate_username(username: &str) -> Result<(), String> {
     }
     Ok(())
 }
+
+pub fn validate_stellar_address(address: &str) -> Result<(), String> {
+    if address.len() != 56 {
+        return Err("wallet_address must be a 56-character Stellar public key".to_string());
+    }
+    if !address.starts_with('G') {
+        return Err("wallet_address must be a valid Stellar public key starting with 'G'".to_string());
+    }
+    if !address
+        .chars()
+        .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit())
+    {
+        return Err("wallet_address must be base32 encoded (A-Z, 2-7)".to_string());
+    }
+    Ok(())
+}
