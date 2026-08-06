@@ -98,4 +98,24 @@ mod tests {
         let address = format!("G{}", "a".repeat(55));
         assert!(validate_stellar_address(&address).is_err());
     }
+
+    #[test]
+    fn accepts_valid_amount() {
+        assert!(validate_amount("10.5").is_ok());
+    }
+
+    #[test]
+    fn rejects_zero_amount() {
+        assert!(validate_amount("0").is_err());
+    }
+
+    #[test]
+    fn rejects_negative_amount() {
+        assert!(validate_amount("-5").is_err());
+    }
+
+    #[test]
+    fn rejects_non_numeric_amount() {
+        assert!(validate_amount("abc").is_err());
+    }
 }
