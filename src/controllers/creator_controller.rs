@@ -74,3 +74,41 @@ pub async fn get_creator(
             .into_response(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::services::stellar_service::StellarService;
+
+    fn test_state(pool: sqlx::PgPool) -> AppState {
+        AppState {
+            db: pool,
+            stellar: StellarService::with_base_url("http://127.0.0.1:1"),
+        }
+    }
+
+    fn valid_wallet() -> String {
+        format!("G{}", "A".repeat(55))
+    }
+
+    #[sqlx::test]
+    async fn creates_and_fetches_creator(pool: sqlx::PgPool) {
+        let state = test_state(pool);
+
+        let create_resp = create_creator(
+            State(state.clone()),
+            Json(CreateCreatorRequest {
+                username: "alice".into(),
+                wallet_address: valid_wallet(),
+            }),
+        )
+        .await
+        .into_response();
+        assert_eq!(create_resp.status(), StatusCode::CREATED);
+
+        let get_resp = get_creator(State(state), Path("alice".into()))
+            .await
+            .into_response();
+        assert_eq!(get_resp.status(), StatusCode::OK);
+    }
+}
