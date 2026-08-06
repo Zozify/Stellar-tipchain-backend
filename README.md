@@ -284,7 +284,7 @@ sqlx migrate revert
 | Column             | Type        | Notes                          |
 |--------------------|-------------|--------------------------------|
 | `id`               | UUID        | Primary key                    |
-| `creator_username` | TEXT        | FK → creators(username)        |
+| `creator_username` | TEXT        | FK → creators(username), indexed |
 | `amount`           | TEXT        |                                |
 | `transaction_hash` | TEXT        | Unique — prevents double-spend |
 | `created_at`       | TIMESTAMPTZ | Defaults to now()              |
