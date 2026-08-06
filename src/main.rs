@@ -1,13 +1,10 @@
 mod controllers;
 mod db;
 mod models;
+mod routes;
 mod services;
 mod validation;
 
-use axum::{
-    routing::{get, post},
-    Router,
-};
 use db::connection::AppState;
 use services::stellar_service::StellarService;
 use sqlx::postgres::PgPoolOptions;
@@ -43,20 +40,7 @@ async fn main() {
         stellar: StellarService::new(&network),
     };
 
-    let app = Router::new()
-        .route(
-            "/creators",
-            post(controllers::creator_controller::create_creator),
-        )
-        .route(
-            "/creators/:username",
-            get(controllers::creator_controller::get_creator),
-        )
-        .route("/tips", post(controllers::tip_controller::create_tip))
-        .route(
-            "/creators/:username/tips",
-            get(controllers::tip_controller::list_tips),
-        )
+    let app = routes::create_router()
         .layer(CorsLayer::permissive())
         .with_state(state);
 
