@@ -79,6 +79,7 @@ Supporter ──POST /tips──► Backend ──GET /transactions/:hash──�
 - List all tips for a creator
 - `GET /health` liveness endpoint
 - Automatic database migrations on startup via SQLx
+- Reversible migrations (`sqlx migrate revert` supported)
 - CORS enabled for all origins
 - Structured logging via `tracing`
 - Unit and integration test coverage (validation, services, controllers)
