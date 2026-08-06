@@ -223,6 +223,10 @@ Request body:
   "transaction_hash": "abc123def456..."
 }
 ```
+Validation:
+- `amount`: a positive, finite number
+- `transaction_hash`: non-empty hexadecimal string
+
 Response `201 Created`:
 ```json
 {
