@@ -101,3 +101,37 @@ pub async fn list_tips(
             .into_response(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::controllers::creator_controller::create_creator;
+    use crate::models::creator::CreateCreatorRequest;
+    use crate::services::stellar_service::StellarService;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
+
+    fn valid_wallet() -> String {
+        format!("G{}", "A".repeat(55))
+    }
+
+    #[sqlx::test]
+    async fn create_tip_for_unknown_creator_returns_404(pool: sqlx::PgPool) {
+        let state = AppState {
+            db: pool,
+            stellar: StellarService::with_base_url("http://127.0.0.1:1"),
+        };
+
+        let resp = create_tip(
+            State(state),
+            Json(CreateTipRequest {
+                username: "nobody".into(),
+                amount: "5".into(),
+                transaction_hash: "abc123".into(),
+            }),
+        )
+        .await
+        .into_response();
+        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+    }
+}
