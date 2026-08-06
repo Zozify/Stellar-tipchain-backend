@@ -34,3 +34,10 @@ pub fn validate_stellar_address(address: &str) -> Result<(), String> {
     }
     Ok(())
 }
+
+pub fn validate_amount(amount: &str) -> Result<(), String> {
+    match amount.trim().parse::<f64>() {
+        Ok(value) if value.is_finite() && value > 0.0 => Ok(()),
+        _ => Err("amount must be a positive number".to_string()),
+    }
+}
