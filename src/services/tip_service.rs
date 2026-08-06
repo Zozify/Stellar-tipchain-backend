@@ -136,4 +136,32 @@ mod tests {
         let result = create_tip(&state, req).await;
         assert!(matches!(result, Err(TipError::TransactionNotFound)));
     }
+
+    #[sqlx::test]
+    async fn records_tip_on_successful_verification(pool: sqlx::PgPool) {
+        insert_creator(&pool, "alice").await;
+
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/transactions/abc123"))
+            .respond_with(
+                ResponseTemplate::new(200).set_body_json(serde_json::json!({"successful": true})),
+            )
+            .mount(&server)
+            .await;
+
+        let state = AppState {
+            db: pool,
+            stellar: StellarService::with_base_url(&server.uri()),
+        };
+        let req = CreateTipRequest {
+            username: "alice".into(),
+            amount: "10.5".into(),
+            transaction_hash: "abc123".into(),
+        };
+
+        let tip = create_tip(&state, req).await.unwrap();
+        assert_eq!(tip.creator_username, "alice");
+        assert_eq!(tip.amount, "10.5");
+    }
 }
