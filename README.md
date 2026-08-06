@@ -81,6 +81,7 @@ Supporter ──POST /tips──► Backend ──GET /transactions/:hash──�
 - Automatic database migrations on startup via SQLx
 - CORS enabled for all origins
 - Structured logging via `tracing`
+- Unit and integration test coverage (validation, services, controllers)
 
 ---
 
@@ -323,21 +324,21 @@ migrations/
 
 ## Current Status
 
-This project is currently **~30% complete**. The following is in place:
+This project is **100% complete** against its original scope. The following is in place:
 
 - [x] Cargo.toml with all dependencies
-- [x] Database migrations (creators + tips tables)
+- [x] Database migrations (creators + tips tables), reversible via `.up.sql`/`.down.sql`
 - [x] Data models (`Creator`, `Tip`, request DTOs)
 - [x] `AppState` with PostgreSQL pool
 - [x] `main.rs` connects to DB and runs migrations
-
-Still to be implemented:
-
-- [ ] `StellarService` — Horizon API transaction verification
-- [ ] `TipService` — tip business logic
-- [ ] Controllers — request handlers
-- [ ] Routes — Axum router wiring
-- [ ] Full server bootstrap (CORS, `axum::serve`)
+- [x] `StellarService` — Horizon API transaction verification
+- [x] `TipService` — tip business logic
+- [x] Controllers — request handlers
+- [x] Routes — Axum router wiring, organized under `routes/`
+- [x] Full server bootstrap (CORS, `axum::serve`)
+- [x] Input validation for all write endpoints
+- [x] `GET /health` liveness endpoint
+- [x] Unit tests (validation) and integration tests (services, controllers) against a real Postgres instance
 
 ---
 
