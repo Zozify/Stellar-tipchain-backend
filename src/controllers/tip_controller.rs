@@ -47,11 +47,14 @@ pub async fn create_tip(
             )
                 .into_response()
         }
-        Err(TipError::DatabaseError(_)) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({"error": "internal server error"})),
-        )
-            .into_response(),
+        Err(TipError::DatabaseError(err)) => {
+            tracing::error!(error = %err, "database error while creating tip");
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({"error": "internal server error"})),
+            )
+                .into_response()
+        }
     }
 }
 
