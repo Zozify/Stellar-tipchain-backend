@@ -76,6 +76,7 @@ Supporter ──POST /tips──► Backend ──GET /transactions/:hash──�
 - Verify Stellar transactions on-chain via Horizon API before recording tips
 - Retrieve creator profiles by username
 - List all tips for a creator
+- `GET /health` liveness endpoint
 - Automatic database migrations on startup via SQLx
 - CORS enabled for all origins
 - Structured logging via `tracing`
@@ -137,6 +138,16 @@ The server applies any pending database migrations automatically on startup, the
 ---
 
 ## API Reference
+
+### Health
+
+```
+GET /health
+```
+Response `200 OK`:
+```json
+{ "status": "ok" }
+```
 
 ### Creators
 
