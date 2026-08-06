@@ -73,6 +73,7 @@ Supporter ──POST /tips──► Backend ──GET /transactions/:hash──�
 ## Features
 
 - Register creators with a username and Stellar wallet address
+- Input validation for usernames, Stellar wallet addresses, tip amounts, and transaction hashes
 - Verify Stellar transactions on-chain via Horizon API before recording tips
 - Retrieve creator profiles by username
 - List all tips for a creator
@@ -162,6 +163,10 @@ Request body:
   "wallet_address": "GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN"
 }
 ```
+Validation:
+- `username`: 3-32 characters, must start with a letter, letters/numbers/underscores only
+- `wallet_address`: 56-character Stellar public key starting with `G`
+
 Response `201 Created`:
 ```json
 {
