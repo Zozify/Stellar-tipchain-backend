@@ -242,6 +242,9 @@ Response `201 Created`:
 
 | Status | Meaning |
 |--------|---------|
+| `400 Bad Request` | Invalid `amount`/`transaction_hash` format, or invalid creator input |
+| `404 Not Found` | Creator does not exist |
+| `409 Conflict` | Transaction hash already recorded, or username already taken |
 | `422 Unprocessable Entity` | Transaction not found or unsuccessful on the Stellar network |
 | `502 Bad Gateway` | Could not reach the Stellar network to verify the transaction |
 | `500 Internal Server Error` | Unexpected server-side error |
