@@ -127,4 +127,29 @@ mod tests {
         .into_response();
         assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
     }
+
+    #[sqlx::test]
+    async fn rejects_duplicate_username(pool: sqlx::PgPool) {
+        let state = test_state(pool);
+
+        create_creator(
+            State(state.clone()),
+            Json(CreateCreatorRequest {
+                username: "alice".into(),
+                wallet_address: valid_wallet(),
+            }),
+        )
+        .await;
+
+        let resp = create_creator(
+            State(state),
+            Json(CreateCreatorRequest {
+                username: "alice".into(),
+                wallet_address: valid_wallet(),
+            }),
+        )
+        .await
+        .into_response();
+        assert_eq!(resp.status(), StatusCode::CONFLICT);
+    }
 }
