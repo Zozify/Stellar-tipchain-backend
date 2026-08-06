@@ -63,3 +63,36 @@ pub async fn create_tip(state: &AppState, req: CreateTipRequest) -> Result<Tip, 
         TipError::DatabaseError(e)
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::services::stellar_service::StellarService;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
+
+    async fn insert_creator(pool: &sqlx::PgPool, username: &str) {
+        sqlx::query("INSERT INTO creators (username, wallet_address) VALUES ($1, $2)")
+            .bind(username)
+            .bind(format!("G{}", "A".repeat(55)))
+            .execute(pool)
+            .await
+            .unwrap();
+    }
+
+    #[sqlx::test]
+    async fn rejects_invalid_amount(pool: sqlx::PgPool) {
+        let state = AppState {
+            db: pool,
+            stellar: StellarService::with_base_url("http://127.0.0.1:1"),
+        };
+        let req = CreateTipRequest {
+            username: "alice".into(),
+            amount: "-5".into(),
+            transaction_hash: "abc123".into(),
+        };
+
+        let result = create_tip(&state, req).await;
+        assert!(matches!(result, Err(TipError::InvalidInput(_))));
+    }
+}
