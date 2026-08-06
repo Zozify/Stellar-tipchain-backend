@@ -134,4 +134,47 @@ mod tests {
         .into_response();
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
     }
+
+    #[sqlx::test]
+    async fn create_tip_end_to_end_returns_201_and_lists_it(pool: sqlx::PgPool) {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/transactions/abc123"))
+            .respond_with(
+                ResponseTemplate::new(200).set_body_json(serde_json::json!({"successful": true})),
+            )
+            .mount(&server)
+            .await;
+
+        let state = AppState {
+            db: pool,
+            stellar: StellarService::with_base_url(&server.uri()),
+        };
+
+        create_creator(
+            State(state.clone()),
+            Json(CreateCreatorRequest {
+                username: "alice".into(),
+                wallet_address: valid_wallet(),
+            }),
+        )
+        .await;
+
+        let create_resp = create_tip(
+            State(state.clone()),
+            Json(CreateTipRequest {
+                username: "alice".into(),
+                amount: "10.5".into(),
+                transaction_hash: "abc123".into(),
+            }),
+        )
+        .await
+        .into_response();
+        assert_eq!(create_resp.status(), StatusCode::CREATED);
+
+        let list_resp = list_tips(State(state), Path("alice".into()))
+            .await
+            .into_response();
+        assert_eq!(list_resp.status(), StatusCode::OK);
+    }
 }
