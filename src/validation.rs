@@ -41,3 +41,13 @@ pub fn validate_amount(amount: &str) -> Result<(), String> {
         _ => Err("amount must be a positive number".to_string()),
     }
 }
+
+pub fn validate_transaction_hash(hash: &str) -> Result<(), String> {
+    if hash.trim().is_empty() {
+        return Err("transaction_hash must not be empty".to_string());
+    }
+    if !hash.chars().all(|c| c.is_ascii_hexdigit()) {
+        return Err("transaction_hash must be a hexadecimal string".to_string());
+    }
+    Ok(())
+}
