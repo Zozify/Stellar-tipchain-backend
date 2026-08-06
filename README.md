@@ -253,7 +253,7 @@ Response `201 Created`:
 
 ## Database Migrations
 
-Migrations live in the `migrations/` directory and run automatically at startup via SQLx.
+Migrations live in the `migrations/` directory and run automatically at startup via SQLx. Each migration ships as a reversible `.up.sql`/`.down.sql` pair.
 
 To manage migrations manually, install the SQLx CLI:
 
