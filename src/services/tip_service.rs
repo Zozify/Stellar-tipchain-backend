@@ -1,9 +1,11 @@
 use crate::db::connection::AppState;
 use crate::models::tip::{CreateTipRequest, Tip};
 use crate::services::stellar_service::StellarVerifyError;
+use crate::validation;
 
 #[derive(Debug)]
 pub enum TipError {
+    InvalidInput(String),
     CreatorNotFound,
     TransactionNotFound,
     TransactionUnsuccessful,
@@ -13,6 +15,10 @@ pub enum TipError {
 }
 
 pub async fn create_tip(state: &AppState, req: CreateTipRequest) -> Result<Tip, TipError> {
+    // Step 0: validate input shape
+    validation::validate_amount(&req.amount).map_err(TipError::InvalidInput)?;
+    validation::validate_transaction_hash(&req.transaction_hash).map_err(TipError::InvalidInput)?;
+
     // Step 1: verify creator exists
     let exists = sqlx::query_scalar::<_, bool>(
         "SELECT EXISTS(SELECT 1 FROM creators WHERE username = $1)",
