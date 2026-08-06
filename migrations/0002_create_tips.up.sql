@@ -5,3 +5,5 @@ CREATE TABLE tips (
     transaction_hash TEXT NOT NULL UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX idx_tips_creator_username ON tips(creator_username);
