@@ -16,6 +16,9 @@ pub async fn create_tip(
 ) -> impl IntoResponse {
     match tip_service::create_tip(&state, body).await {
         Ok(tip) => (StatusCode::CREATED, Json(json!(tip))).into_response(),
+        Err(TipError::InvalidInput(msg)) => {
+            (StatusCode::BAD_REQUEST, Json(json!({"error": msg}))).into_response()
+        }
         Err(TipError::CreatorNotFound) => (
             StatusCode::NOT_FOUND,
             Json(json!({"error": "creator not found"})),
