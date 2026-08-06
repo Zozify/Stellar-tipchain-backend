@@ -118,4 +118,19 @@ mod tests {
     fn rejects_non_numeric_amount() {
         assert!(validate_amount("abc").is_err());
     }
+
+    #[test]
+    fn accepts_valid_transaction_hash() {
+        assert!(validate_transaction_hash("abc123def456").is_ok());
+    }
+
+    #[test]
+    fn rejects_empty_transaction_hash() {
+        assert!(validate_transaction_hash("").is_err());
+    }
+
+    #[test]
+    fn rejects_non_hex_transaction_hash() {
+        assert!(validate_transaction_hash("not-hex!").is_err());
+    }
 }
