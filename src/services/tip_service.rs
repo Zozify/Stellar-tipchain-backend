@@ -164,4 +164,38 @@ mod tests {
         assert_eq!(tip.creator_username, "alice");
         assert_eq!(tip.amount, "10.5");
     }
+
+    #[sqlx::test]
+    async fn rejects_duplicate_transaction_hash(pool: sqlx::PgPool) {
+        insert_creator(&pool, "alice").await;
+
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/transactions/abc123"))
+            .respond_with(
+                ResponseTemplate::new(200).set_body_json(serde_json::json!({"successful": true})),
+            )
+            .mount(&server)
+            .await;
+
+        let state = AppState {
+            db: pool,
+            stellar: StellarService::with_base_url(&server.uri()),
+        };
+        let req = CreateTipRequest {
+            username: "alice".into(),
+            amount: "10.5".into(),
+            transaction_hash: "abc123".into(),
+        };
+
+        create_tip(&state, req).await.unwrap();
+
+        let req2 = CreateTipRequest {
+            username: "alice".into(),
+            amount: "3".into(),
+            transaction_hash: "abc123".into(),
+        };
+        let result = create_tip(&state, req2).await;
+        assert!(matches!(result, Err(TipError::DuplicateTransaction)));
+    }
 }
