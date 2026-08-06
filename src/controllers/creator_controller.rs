@@ -40,11 +40,14 @@ pub async fn create_creator(
             Json(json!({"error": "username already taken"})),
         )
             .into_response(),
-        Err(_) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({"error": "internal server error"})),
-        )
-            .into_response(),
+        Err(err) => {
+            tracing::error!(error = %err, "database error while creating creator");
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({"error": "internal server error"})),
+            )
+                .into_response()
+        }
     }
 }
 
