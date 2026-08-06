@@ -2,6 +2,7 @@ mod controllers;
 mod db;
 mod models;
 mod services;
+mod validation;
 
 use axum::{
     routing::{get, post},

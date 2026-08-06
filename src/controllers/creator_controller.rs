@@ -9,11 +9,19 @@ use uuid::Uuid;
 
 use crate::db::connection::AppState;
 use crate::models::creator::{CreateCreatorRequest, Creator};
+use crate::validation;
 
 pub async fn create_creator(
     State(state): State<AppState>,
     Json(body): Json<CreateCreatorRequest>,
 ) -> impl IntoResponse {
+    if let Err(msg) = validation::validate_username(&body.username) {
+        return (StatusCode::BAD_REQUEST, Json(json!({ "error": msg }))).into_response();
+    }
+    if let Err(msg) = validation::validate_stellar_address(&body.wallet_address) {
+        return (StatusCode::BAD_REQUEST, Json(json!({ "error": msg }))).into_response();
+    }
+
     let result = sqlx::query_as::<_, Creator>(
         "INSERT INTO creators (id, username, wallet_address, created_at)
          VALUES ($1, $2, $3, NOW())
