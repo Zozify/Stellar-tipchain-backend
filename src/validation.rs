@@ -75,4 +75,27 @@ mod tests {
     fn rejects_username_with_invalid_chars() {
         assert!(validate_username("alice!").is_err());
     }
+
+    #[test]
+    fn accepts_valid_stellar_address() {
+        let address = format!("G{}", "A".repeat(55));
+        assert!(validate_stellar_address(&address).is_ok());
+    }
+
+    #[test]
+    fn rejects_wrong_length_address() {
+        assert!(validate_stellar_address("GSHORT").is_err());
+    }
+
+    #[test]
+    fn rejects_address_not_starting_with_g() {
+        let address = format!("A{}", "A".repeat(55));
+        assert!(validate_stellar_address(&address).is_err());
+    }
+
+    #[test]
+    fn rejects_lowercase_address() {
+        let address = format!("G{}", "a".repeat(55));
+        assert!(validate_stellar_address(&address).is_err());
+    }
 }
