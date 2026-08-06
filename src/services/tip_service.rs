@@ -111,4 +111,29 @@ mod tests {
         let result = create_tip(&state, req).await;
         assert!(matches!(result, Err(TipError::CreatorNotFound)));
     }
+
+    #[sqlx::test]
+    async fn errors_when_transaction_not_found_on_chain(pool: sqlx::PgPool) {
+        insert_creator(&pool, "alice").await;
+
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/transactions/deadbeef"))
+            .respond_with(ResponseTemplate::new(404))
+            .mount(&server)
+            .await;
+
+        let state = AppState {
+            db: pool,
+            stellar: StellarService::with_base_url(&server.uri()),
+        };
+        let req = CreateTipRequest {
+            username: "alice".into(),
+            amount: "5".into(),
+            transaction_hash: "deadbeef".into(),
+        };
+
+        let result = create_tip(&state, req).await;
+        assert!(matches!(result, Err(TipError::TransactionNotFound)));
+    }
 }
