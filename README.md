@@ -296,23 +296,27 @@ sqlx migrate revert
 ```
 src/
 ├── main.rs                        # Server bootstrap (env, DB pool, router, CORS)
+├── validation.rs                  # Input validation (username, wallet, amount, tx hash)
 ├── controllers/
 │   ├── creator_controller.rs      # Creator CRUD handlers
-│   └── tip_controller.rs          # Tip handler
+│   └── tip_controller.rs          # Tip handlers
 ├── db/
 │   └── connection.rs              # AppState (DB pool + StellarService)
 ├── models/
 │   ├── creator.rs                 # Creator entity + request DTO
 │   └── tip.rs                     # Tip entity + request DTO
 ├── routes/
+│   ├── health.rs                  # /health endpoint
 │   ├── creators.rs                # /creators endpoints
-│   └── tips.rs                    # /tips endpoint
+│   └── tips.rs                    # /tips endpoints
 └── services/
     ├── stellar_service.rs         # Horizon API transaction verification
     └── tip_service.rs             # Tip business logic
 migrations/
-├── 0001_create_creators.sql
-└── 0002_create_tips.sql
+├── 0001_create_creators.up.sql
+├── 0001_create_creators.down.sql
+├── 0002_create_tips.up.sql
+└── 0002_create_tips.down.sql
 ```
 
 ---
