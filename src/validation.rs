@@ -51,3 +51,28 @@ pub fn validate_transaction_hash(hash: &str) -> Result<(), String> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn accepts_valid_username() {
+        assert!(validate_username("alice_99").is_ok());
+    }
+
+    #[test]
+    fn rejects_short_username() {
+        assert!(validate_username("ab").is_err());
+    }
+
+    #[test]
+    fn rejects_username_starting_with_digit() {
+        assert!(validate_username("9alice").is_err());
+    }
+
+    #[test]
+    fn rejects_username_with_invalid_chars() {
+        assert!(validate_username("alice!").is_err());
+    }
+}
