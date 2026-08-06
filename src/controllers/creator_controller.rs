@@ -152,4 +152,14 @@ mod tests {
         .into_response();
         assert_eq!(resp.status(), StatusCode::CONFLICT);
     }
+
+    #[sqlx::test]
+    async fn get_unknown_creator_returns_404(pool: sqlx::PgPool) {
+        let state = test_state(pool);
+
+        let resp = get_creator(State(state), Path("nobody".into()))
+            .await
+            .into_response();
+        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+    }
 }
