@@ -39,11 +39,14 @@ pub async fn create_tip(
             Json(json!({"error": "transaction already recorded"})),
         )
             .into_response(),
-        Err(TipError::StellarUnreachable(_)) => (
-            StatusCode::BAD_GATEWAY,
-            Json(json!({"error": "stellar network unreachable"})),
-        )
-            .into_response(),
+        Err(TipError::StellarUnreachable(reason)) => {
+            tracing::error!(reason = %reason, "stellar network unreachable while verifying tip");
+            (
+                StatusCode::BAD_GATEWAY,
+                Json(json!({"error": "stellar network unreachable"})),
+            )
+                .into_response()
+        }
         Err(TipError::DatabaseError(_)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(json!({"error": "internal server error"})),
